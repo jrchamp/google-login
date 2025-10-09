@@ -244,6 +244,9 @@ class Settings implements ModuleInterface {
 					value='1'>
 			<?php esc_html_e( 'One Tap Login', 'login-with-google' ); ?>
 		</label>
+		<p>
+			<?php esc_html_e( 'Warning: One Tap login is more convenient, but it bypasses two-factor authentication (2FA).', 'login-with-google' ); ?>
+		</p>
 		<?php
 	}
 
