@@ -8,6 +8,11 @@
 
 use RtCamp\GoogleLogin\Utils\Helper;
 
+// Variables for rendering the template.
+$login_url = $variables['login_url'] ?? null;
+$button_text = $variables['button_text'] ?? null;
+$custom_btn_text = $variables['custom_btn_text'] ?? null;
+
 if ( isset( $custom_btn_text ) && $custom_btn_text ) {
 	$button_text = esc_html( $custom_btn_text );
 } else {
