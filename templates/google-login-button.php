@@ -2,7 +2,7 @@
 /**
  * Template for google login button.
  *
- * @package RtCamp\GithubLogin
+ * @package RtCamp\GoogleLogin
  * @since 1.0.0
  */
 
