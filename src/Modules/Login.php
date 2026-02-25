@@ -91,7 +91,7 @@ class Login {
 	 */
 	public function login_button(): void {
 		$template  = trailingslashit( plugin()->template_dir ) . 'google-login-button.php';
-		$login_url = plugin()->container()->get( 'gh_client' )->authorization_url();
+		$login_url = container()->get( 'gh_client' )->authorization_url();
 
 		Helper::render_template(
 			$template,
