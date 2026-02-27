@@ -75,9 +75,9 @@ class GoogleClient {
 	 * @param array $config Configuration for client.
 	 */
 	public function __construct( array $config ) {
-		$this->client_id     = $config['client_id'] ?? '';
+		$this->client_id = $config['client_id'] ?? '';
 		$this->client_secret = $config['client_secret'] ?? '';
-		$this->redirect_uri  = $config['redirect_uri'] ?? '';
+		$this->redirect_uri = $config['redirect_uri'] ?? '';
 	}
 
 	/**
@@ -114,7 +114,7 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function get_redirect_url(): string {
-		return apply_filters( 'rtcamp.google_redirect_url', $this->redirect_uri );
+		return apply_filters( 'google_login_redirect_url', $this->redirect_uri );
 	}
 
 	/**
@@ -202,8 +202,8 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function state(): string {
-		$state_data             = apply_filters( 'rtcamp.google_login_state', $state_data );
-		$state_data['nonce']    = wp_create_nonce( 'login_with_google' );
+		$state_data = apply_filters( 'google_login_state', $state_data );
+		$state_data['nonce'] = wp_create_nonce( 'login_with_google' );
 		$state_data['provider'] = 'google';
 
 		return base64_encode( wp_json_encode( $state_data ) );

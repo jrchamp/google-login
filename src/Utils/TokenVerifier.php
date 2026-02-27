@@ -151,7 +151,7 @@ class TokenVerifier {
 		}
 
 		$transient_key = 'lwg_pk_' . $key_id;
-		$cached_pk     = $this->get_transient( $transient_key );
+		$cached_pk = $this->get_transient( $transient_key );
 
 		if ( ! empty( $cached_pk ) ) {
 			return (string) $cached_pk;
@@ -165,8 +165,8 @@ class TokenVerifier {
 		}
 
 		$headers = wp_remote_retrieve_headers( $certs );
-		$keys    = wp_remote_retrieve_body( $certs );
-		$keys    = json_decode( $keys );
+		$keys = wp_remote_retrieve_body( $certs );
+		$keys = json_decode( $keys );
 
 		if ( property_exists( $keys, $key_id ) ) {
 			$max_age = is_object( $headers ) && is_a( $headers, Requests_Utility_CaseInsensitiveDictionary::class ) ? $this->get_max_age( $headers ) : 0;
@@ -202,8 +202,8 @@ class TokenVerifier {
 		}
 
 		list( $header, $payload, $obtained_signature ) = $parts;
-		$header                                        = $this->base64_decode_url( $header );
-		$payload                                       = $this->base64_decode_url( $payload );
+		$header = $this->base64_decode_url( $header );
+		$payload = $this->base64_decode_url( $payload );
 
 		if ( ! $header || ! $payload ) {
 			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-google' ) );
@@ -224,8 +224,8 @@ class TokenVerifier {
 	 */
 	private function is_valid_signature(): void {
 		list( $header, $payload, $obtained_signature ) = $this->is_valid_jwt();
-		$parsed_header                                 = json_decode( $header );
-		$parsed_header                                 = wp_parse_args(
+		$parsed_header = json_decode( $header );
+		$parsed_header = wp_parse_args(
 			(array) $parsed_header,
 			array(
 				'kid' => null,
@@ -238,9 +238,9 @@ class TokenVerifier {
 			throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-google' ) );
 		}
 
-		$pubkey_pem           = $this->get_public_key( $parsed_header['kid'] );
-		$decryption_key       = openssl_pkey_get_public( $pubkey_pem );
-		$data                 = $this->base64_encode_url( $header ) . '.' . $this->base64_encode_url( $payload );
+		$pubkey_pem = $this->get_public_key( $parsed_header['kid'] );
+		$decryption_key = openssl_pkey_get_public( $pubkey_pem );
+		$data = $this->base64_encode_url( $header ) . '.' . $this->base64_encode_url( $payload );
 		$calculated_signature = openssl_verify( $data, $this->base64_decode_url( $obtained_signature ), $decryption_key, self::get_supported_algorithm( $parsed_header['alg'] ) );
 
 		if ( 1 === (int) $calculated_signature ) {

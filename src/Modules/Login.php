@@ -59,7 +59,7 @@ class Login {
 	 * @param Authenticator $authenticator Settings object.
 	 */
 	public function __construct( GoogleClient $client, Authenticator $authenticator ) {
-		$this->gh_client     = $client;
+		$this->gh_client = $client;
 		$this->authenticator = $authenticator;
 	}
 
@@ -79,9 +79,9 @@ class Login {
 		 * Filters.
 		 */
 		// Priority is 20 because of issue: https://core.trac.wordpress.org/ticket/46748.
-		add_filter( 'authenticate', [ $this, 'authenticate' ], 20 );
-		add_filter( 'rtcamp.google_redirect_url', array( $this, 'redirect_url' ) );
-		add_filter( 'rtcamp.google_login_state', array( $this, 'state_redirect' ) );
+		add_filter( 'authenticate', array( $this, 'authenticate' ), 20 );
+		add_filter( 'google_login_redirect_url', array( $this, 'redirect_url' ) );
+		add_filter( 'google_login_state', array( $this, 'state_redirect' ) );
 	}
 
 	/**
@@ -98,13 +98,13 @@ class Login {
 
 		if ( is_user_logged_in() ) {
 			$button_text = __( 'Log out', 'login-with-google' );
-			$button_url  = wp_logout_url( Helper::get_redirect_url() );
+			$button_url = wp_logout_url( Helper::get_redirect_url() );
 		} else {
 			$button_url = $login_url;
 			$button_text = __( 'Login with Google', 'login-with-google' );
 		}
 
-?>
+		?>
 <div class="wp_google_login">
 	<div class="wp_google_login__button-container">
 		<a class="wp_google_login__button" href="<?php echo esc_url( $button_url ); ?>">
@@ -113,7 +113,7 @@ class Login {
 		</a>
 	</div>
 </div>
-<?php
+		<?php
 	}
 
 	/**
@@ -135,7 +135,7 @@ class Login {
 			return $user;
 		}
 
-		$state         = filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$state = filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;    // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 
 		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) || 'google' !== $decoded_state['provider'] ) {

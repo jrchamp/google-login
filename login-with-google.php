@@ -157,8 +157,8 @@ class Plugin {
 	 * @return void
 	 */
 	public function run(): void {
-		$this->path =  __DIR__;
-		$this->url  = plugin_dir_url( trailingslashit( __DIR__ ) . 'login-with-google.php' );
+		$this->path = __DIR__;
+		$this->url = plugin_dir_url( trailingslashit( __DIR__ ) . 'login-with-google.php' );
 
 		$this->activate_modules();
 
@@ -213,8 +213,16 @@ class Plugin {
  * @package RtCamp\GoogleLogin
  */
 class Container {
+	/**
+	 * Services.
+	 *
+	 * @var array
+	 */
 	private $services = array();
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		$this->services = array(
 			/**
@@ -232,7 +240,7 @@ class Container {
 			 * @return Login
 			 */
 			'login_flow' => function () {
-				return new Login( container()->get('gh_client'), container()->get('authenticator') );
+				return new Login( container()->get( 'gh_client' ), container()->get( 'authenticator' ) );
 			},
 
 			/**
@@ -241,7 +249,7 @@ class Container {
 			 * @return GoogleClient
 			 */
 			'gh_client' => function () {
-				$settings = container()->get('settings');
+				$settings = container()->get( 'settings' );
 
 				return new GoogleClient(
 					array(
@@ -260,7 +268,7 @@ class Container {
 			 * @return TokenVerifier
 			 */
 			'token_verifier' => function () {
-				return new TokenVerifier( container()->get('settings') );
+				return new TokenVerifier( container()->get( 'settings' ) );
 			},
 
 			/**
@@ -269,7 +277,7 @@ class Container {
 			 * @return Authenticator
 			 */
 			'authenticator' => function () {
-				return new Authenticator( container()->get('settings') );
+				return new Authenticator( container()->get( 'settings' ) );
 			},
 		);
 	}

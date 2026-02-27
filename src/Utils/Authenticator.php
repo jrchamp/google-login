@@ -141,9 +141,9 @@ class Authenticator {
 			return $user;
 		}
 
-		$email       = $user->email;
-		$user_login  = sanitize_user( current( explode( '@', $email ) ), true );
-		$user_login  = Helper::unique_username( $user_login );
+		$email = $user->email;
+		$user_login = sanitize_user( current( explode( '@', $email ) ), true );
+		$user_login = Helper::unique_username( $user_login );
 		$user->login = $user_login;
 
 		return $user;
@@ -160,8 +160,8 @@ class Authenticator {
 		$allowed_domains = explode( ',', $this->settings->allowed_domains );
 		$allowed_domains = array_map( 'strtolower', $allowed_domains );
 		$allowed_domains = array_map( 'trim', $allowed_domains );
-		$email_parts     = explode( '@', $email );
-		$email_parts     = array_map( 'strtolower', $email_parts );
+		$email_parts = explode( '@', $email );
+		$email_parts = array_map( 'strtolower', $email_parts );
 
 		return in_array( $email_parts[1], $allowed_domains, true );
 	}
