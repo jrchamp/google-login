@@ -72,6 +72,26 @@ class Authenticator {
 	}
 
 	/**
+	 * Checks if username exists, if it does, creates a
+	 * unique username by appending digits.
+	 *
+	 * @param string $username Username.
+	 *
+	 * @return string
+	 */
+	public static function unique_username( string $username ): string {
+		$uname = $username;
+		$count = 1;
+
+		while ( username_exists( $uname ) ) {
+			$uname = $username . $count;
+			++$count;
+		}
+
+		return $uname;
+	}
+
+	/**
 	 * Register the new user if setting is on for registration.
 	 *
 	 * @param stdClass $user User object from google.
@@ -92,7 +112,7 @@ class Authenticator {
 			if ( empty( $allowed_domains ) || $this->can_register_with_email( $user->email ) ) {
 				$uid = wp_insert_user(
 					array(
-						'user_login' => Helper::unique_username( $user->login ),
+						'user_login' => self::unique_username( $user->login ),
 						'user_pass'  => wp_generate_password( 18 ),
 						'user_email' => $user->email,
 						'first_name' => $user->given_name ?? '',
@@ -141,7 +161,7 @@ class Authenticator {
 
 		$email = $user->email;
 		$user_login = sanitize_user( current( explode( '@', $email ) ), true );
-		$user_login = Helper::unique_username( $user_login );
+		$user_login = self::unique_username( $user_login );
 		$user->login = $user_login;
 
 		return $user;

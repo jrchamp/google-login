@@ -19,7 +19,6 @@ use WP_Error;
 use stdClass;
 use Throwable;
 use Exception;
-use GoogleLogin\Utils\Helper;
 use GoogleLogin\Utils\GoogleClient;
 use GoogleLogin\Utils\Authenticator;
 use function GoogleLogin\plugin;
@@ -85,6 +84,39 @@ class Login {
 	}
 
 	/**
+	 * Get the redirection URL and set the redirection URL to the default URL.
+	 *
+	 * This function offers customization to the users for the URL that they want to be redirected to.
+	 *
+	 * @return string
+	 */
+	public static function get_redirect_url(): string {
+		global $pagenow;
+
+		// Initializing the default with admin URL.
+		$default_redirect_url = admin_url();
+
+		if ( 'wp-login.php' === $pagenow ) {
+			// If any redirect_to query parameter is available.
+			$redirect_to = filter_input( INPUT_GET, 'redirect_to', FILTER_SANITIZE_URL );
+
+			// In case the query parameter is available.
+			if ( ! empty( $redirect_to ) ) {
+				$default_redirect_url = $redirect_to;
+			}
+		} else {
+			$request_uri = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+			if ( empty( $request_uri ) ) {
+				$default_redirect_url = home_url();
+			} else {
+				$default_redirect_url = home_url( trim( $request_uri ) );
+			}
+		}
+
+		return $default_redirect_url;
+	}
+
+	/**
 	 * Add the login button to login form.
 	 *
 	 * @return void
@@ -98,7 +130,7 @@ class Login {
 
 		if ( is_user_logged_in() ) {
 			$button_text = __( 'Log out', 'google-login' );
-			$button_url = wp_logout_url( Helper::get_redirect_url() );
+			$button_url = wp_logout_url( self::get_redirect_url() );
 		} else {
 			$button_url = $login_url;
 			$button_text = __( 'Log in with Google', 'google-login' );
