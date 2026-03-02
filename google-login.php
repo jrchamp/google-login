@@ -41,14 +41,14 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			$hook,
 			function () {
 				$message = __(
-					'Login with google Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to a newer PHP version',
+					'Google Login plugin requires PHP version 7.4 or higher.',
 					'google-login'
 				);
 
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
-						'The plugin Login with Google has been deactivated',
+						'The Google Login plugin has been deactivated',
 						'google-login'
 					),
 					wp_kses( $message, array( 'br' => true ) )
@@ -88,7 +88,7 @@ function plugin(): Plugin {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
 	if ( isset( $_GET['reauth'] ) && null !== sanitize_text_field( wp_unslash( $_GET['reauth'] ) ) ) {
 		if ( ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-			wp_safe_redirect( wp_login_url(), 302, 'Login with Google' );
+			wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
 			exit;
 		}
 	}
@@ -147,7 +147,7 @@ class Plugin {
 	 */
 	public $active_modules = array(
 		'settings',
-		'login_flow',
+		'login',
 	);
 
 	/**
@@ -238,7 +238,7 @@ class Container {
 			 *
 			 * @return Login
 			 */
-			'login_flow' => function () {
+			'login' => function () {
 				return new Login( container()->get( 'google_client' ), container()->get( 'authenticator' ) );
 			},
 
