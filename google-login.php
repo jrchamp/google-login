@@ -23,7 +23,6 @@ use GoogleLogin\Modules\Login;
 use GoogleLogin\Modules\Settings;
 use GoogleLogin\Utils\Authenticator;
 use GoogleLogin\Utils\GoogleClient;
-use GoogleLogin\Utils\TokenVerifier;
 
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;
@@ -258,17 +257,6 @@ class Container {
 						'redirect_uri'  => wp_login_url(),
 					)
 				);
-			},
-
-			/**
-			 * Define Token Verifier Service.
-			 *
-			 * Useful in verifying JWT Auth token.
-			 *
-			 * @return TokenVerifier
-			 */
-			'token_verifier' => function () {
-				return new TokenVerifier( container()->get( 'settings' ) );
 			},
 
 			/**
