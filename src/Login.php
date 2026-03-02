@@ -12,21 +12,21 @@
 
 declare(strict_types=1);
 
-namespace GoogleLogin\Modules;
+namespace GoogleLogin;
 
 use WP_User;
 use WP_Error;
 use stdClass;
 use Throwable;
 use Exception;
-use GoogleLogin\Utils\GoogleClient;
-use GoogleLogin\Utils\Authenticator;
+use GoogleLogin\GoogleClient;
+use GoogleLogin\Authenticator;
 use function GoogleLogin\services;
 
 /**
  * Class Login.
  *
- * @package GoogleLogin\Modules
+ * @package GoogleLogin
  */
 class Login {
 	/**

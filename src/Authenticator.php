@@ -11,20 +11,20 @@
 
 declare(strict_types=1);
 
-namespace GoogleLogin\Utils;
+namespace GoogleLogin;
 
 use WP_User;
 use stdClass;
 use Exception;
 use Throwable;
 use InvalidArgumentException;
-use GoogleLogin\Modules\Settings;
+use GoogleLogin\Settings;
 use function GoogleLogin\services;
 
 /**
  * Class Authenticator
  *
- * @package GoogleLogin\Utils
+ * @package GoogleLogin
  */
 class Authenticator {
 	/**

@@ -19,10 +19,10 @@ declare(strict_types=1);
 namespace GoogleLogin;
 
 use InvalidArgumentException;
-use GoogleLogin\Modules\Login;
-use GoogleLogin\Modules\Settings;
-use GoogleLogin\Utils\Authenticator;
-use GoogleLogin\Utils\GoogleClient;
+use GoogleLogin\Authenticator;
+use GoogleLogin\GoogleClient;
+use GoogleLogin\Login;
+use GoogleLogin\Settings;
 
 // Prevent direct access.
 defined( 'ABSPATH' ) || exit;

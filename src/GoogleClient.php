@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace GoogleLogin\Utils;
+namespace GoogleLogin;
 
 use Exception;
 use function GoogleLogin\services;
@@ -18,7 +18,7 @@ use function GoogleLogin\services;
 /**
  * Class GoogleClient
  *
- * @package GoogleLogin\Utils
+ * @package GoogleLogin
  */
 class GoogleClient {
 	/**

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace GoogleLogin\Modules;
+namespace GoogleLogin;
 
 /**
  * Class Settings.
@@ -19,7 +19,7 @@ namespace GoogleLogin\Modules;
  * @property string|null client_secret
  * @property bool|null registration_enabled
  *
- * @package GoogleLogin\Modules
+ * @package GoogleLogin
  */
 class Settings {
 
