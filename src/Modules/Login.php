@@ -21,7 +21,7 @@ use Throwable;
 use Exception;
 use GoogleLogin\Utils\GoogleClient;
 use GoogleLogin\Utils\Authenticator;
-use function GoogleLogin\plugin;
+use function GoogleLogin\services;
 
 /**
  * Class Login.
@@ -30,37 +30,12 @@ use function GoogleLogin\plugin;
  */
 class Login {
 	/**
-	 * Google client instance.
-	 *
-	 * @var GoogleClient
-	 */
-	private $google_client;
-
-	/**
-	 * Authenticator instance.
-	 *
-	 * @var Authenticator
-	 */
-	private $authenticator;
-
-	/**
 	 * Flag for determining whether the user has been authenticated
 	 * from plugin.
 	 *
 	 * @var bool
 	 */
 	private $authenticated = false;
-
-	/**
-	 * Login constructor.
-	 *
-	 * @param GoogleClient  $client Google Client object.
-	 * @param Authenticator $authenticator Settings object.
-	 */
-	public function __construct( GoogleClient $client, Authenticator $authenticator ) {
-		$this->google_client = $client;
-		$this->authenticator = $authenticator;
-	}
 
 	/**
 	 * Initialize login flow.
@@ -122,7 +97,7 @@ class Login {
 	 * @return void
 	 */
 	public function login_button(): void {
-		$login_url = container()->get( 'google_client' )->authorization_url();
+		$login_url = services( 'google_client' )->authorization_url();
 
 		if ( empty( $login_url ) ) {
 			return;
@@ -179,9 +154,9 @@ class Login {
 		}
 
 		try {
-			$this->google_client->set_access_token( $code );
-			$user = $this->google_client->user();
-			$user = $this->authenticator->authenticate( $user );
+			services( 'google_client' )->set_access_token( $code );
+			$user = services( 'google_client' )->user();
+			$user = services( 'authenticator' )->authenticate( $user );
 
 			if ( $user instanceof WP_User ) {
 				$this->authenticated = true;

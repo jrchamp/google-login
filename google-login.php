@@ -63,231 +63,87 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 }
 
 /**
- * Return the container instance.
+ * Get a service object.
+ *
+ * @param string $service Service needed.
+ *
+ * @return object
+ *
+ * @throws InvalidArgumentException Exception for invalid service.
  */
-function container(): Container {
-	static $container;
+function services( string $service ) {
+	static $services = array(
+		// Adds settings page and retrieves setting values.
+		'settings' => Settings::class,
 
-	if ( empty( $container ) ) {
-		$container = new Container();
+		// Hooks the login process.
+		'login' => Login::class,
+
+		// Provides a Google OAuth client.
+		'google_client' => GoogleClient::class,
+
+		// Handles WordPress authentication.
+		'authenticator' => Authenticator::class,
+	);
+
+	$maybe_object = $services[ $service ] ?? throw new InvalidArgumentException();
+
+	// Initialize objects the first time they are needed.
+	if ( ! is_object( $maybe_object ) ) {
+		$service_object = new $maybe_object();
+		$services[ $service ] = $service_object;
 	}
 
-	return $container;
+	return $services[ $service ];
 }
 
-/**
- * Return the Plugin instance.
- *
- * If reauth is set, redirect to login page.
- *
- * @return Plugin
- */
-function plugin(): Plugin {
-	static $plugin;
-
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
-	if ( isset( $_GET['reauth'] ) && null !== sanitize_text_field( wp_unslash( $_GET['reauth'] ) ) ) {
-		if ( ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-			wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
-			exit;
-		}
-	}
-
-	if ( empty( $plugin ) ) {
-		$plugin = new Plugin();
-	}
-
-	return $plugin;
-}
-
-/**
- * Let the magic happen by
- * running the plugin.
- */
+// Initialize the plugin.
 add_action(
 	'plugins_loaded',
 	function () {
-		plugin()->run();
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
+		if ( isset( $_GET['reauth'] ) && null !== sanitize_text_field( wp_unslash( $_GET['reauth'] ) ) ) {
+			if ( ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
+				wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
+				exit;
+			}
+		}
+
+		$active_modules = array(
+			'settings',
+			'login',
+		);
+		foreach ( $active_modules as $module ) {
+			services( $module );
+		}
 	},
 	100
 );
 
+// Load the plugin translation if available.
+add_action(
+	'init',
+	function () {
+		load_plugin_textdomain( 'google-login', false, plugin_basename( __DIR__ ) . '/languages' );
+	}
+);
+
 /**
- * Class Plugin.
+ * Add settings link to plugin actions
  *
- * @package GoogleLogin
+ * @param  array $actions Plugin actions.
+ * @return array
  */
-class Plugin {
-
-	/**
-	 * Plugin version.
-	 *
-	 * @var string
-	 */
-	public $version = '1.0.0';
-
-	/**
-	 * Plugin directory path.
-	 *
-	 * @var string
-	 */
-	public $path;
-
-	/**
-	 * Plugin's url.
-	 *
-	 * @var string
-	 */
-	public $url;
-
-	/**
-	 * List of active modules.
-	 *
-	 * @var string[]
-	 */
-	public $active_modules = array(
-		'settings',
-		'login',
+$add_plugin_action_links = function ( $actions ) {
+	$new_actions = array(
+		'settings' => sprintf(
+			/* translators: %1$s: Setting name, %2$s: URL for settings page link. */
+			'<a href="%1$s">%2$s</a>',
+			esc_url( admin_url( 'options-general.php?page=google-login' ) ),
+			esc_html__( 'Settings', 'google-login' )
+		),
 	);
 
-	/**
-	 * Run the plugin
-	 *
-	 * @return void
-	 */
-	public function run(): void {
-		$this->path = __DIR__;
-		$this->url = plugin_dir_url( trailingslashit( __DIR__ ) . 'google-login.php' );
-
-		$this->activate_modules();
-
-		add_action( 'init', array( $this, 'load_translations' ) );
-
-		add_filter( 'plugin_action_links_' . plugin_basename( $this->path ) . '/google-login.php', array( $this, 'add_plugin_action_links' ) );
-	}
-
-	/**
-	 *  Load the plugin translation if available.
-	 *
-	 * @return void
-	 */
-	public function load_translations(): void {
-		load_plugin_textdomain( 'google-login', false, basename( plugin()->path ) . '/languages/' . get_locale() );
-	}
-
-	/**
-	 * Activate individual modules.
-	 *
-	 * @return void
-	 */
-	private function activate_modules(): void {
-		foreach ( $this->active_modules as $module ) {
-			container()->get( $module );
-		}
-	}
-
-	/**
-	 * Add settings link to plugin actions
-	 *
-	 * @param  array $actions Plugin actions.
-	 * @return array
-	 */
-	public function add_plugin_action_links( $actions ) {
-		$new_actions = array(
-			'settings' => sprintf(
-				/* translators: %1$s: Setting name, %2$s: URL for settings page link. */
-				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url( 'options-general.php?page=google-login' ) ),
-				esc_html__( 'Settings', 'google-login' )
-			),
-		);
-
-		return array_merge( $new_actions, $actions );
-	}
+	return array_merge( $new_actions, $actions );
 }
-
-/**
- * Class Container
- *
- * @package GoogleLogin
- */
-class Container {
-	/**
-	 * Services.
-	 *
-	 * @var array
-	 */
-	private $services = array();
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->services = array(
-			/**
-			 * Define Settings service to add settings page and retrieve setting values.
-			 *
-			 * @return Settings
-			 */
-			'settings' => function () {
-				return new Settings();
-			},
-
-			/**
-			 * Define the login flow service.
-			 *
-			 * @return Login
-			 */
-			'login' => function () {
-				return new Login( container()->get( 'google_client' ), container()->get( 'authenticator' ) );
-			},
-
-			/**
-			 * Define a service for Google OAuth client.
-			 *
-			 * @return GoogleClient
-			 */
-			'google_client' => function () {
-				$settings = container()->get( 'settings' );
-
-				return new GoogleClient(
-					array(
-						'client_id'     => $settings->client_id,
-						'client_secret' => $settings->client_secret,
-						'redirect_uri'  => wp_login_url(),
-					)
-				);
-			},
-
-			/**
-			 * Authenticator utility.
-			 *
-			 * @return Authenticator
-			 */
-			'authenticator' => function () {
-				return new Authenticator( container()->get( 'settings' ) );
-			},
-		);
-	}
-
-	/**
-	 * Get the service object.
-	 *
-	 * @param string $service Service needed.
-	 *
-	 * @return object
-	 *
-	 * @throws InvalidArgumentException Exception for invalid service.
-	 */
-	public function get( string $service ) {
-		$maybe_callable = $this->services[ $service ] ?? throw new InvalidArgumentException();
-
-		// Initialize objects the first time they are needed.
-		if ( is_callable( $maybe_callable ) ) {
-			$service_object = $maybe_callable();
-			$this->services[ $service ] = $service_object;
-		}
-
-		return $this->services[ $service ];
-	}
-}
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), $add_plugin_action_links );

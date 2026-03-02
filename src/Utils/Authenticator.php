@@ -19,6 +19,7 @@ use Exception;
 use Throwable;
 use InvalidArgumentException;
 use GoogleLogin\Modules\Settings;
+use function GoogleLogin\services;
 
 /**
  * Class Authenticator
@@ -26,22 +27,6 @@ use GoogleLogin\Modules\Settings;
  * @package GoogleLogin\Utils
  */
 class Authenticator {
-	/**
-	 * Settings instance.
-	 *
-	 * @var Settings
-	 */
-	private $settings;
-
-	/**
-	 * Authenticator constructor.
-	 *
-	 * @param Settings $settings Settings instance.
-	 */
-	public function __construct( Settings $settings ) {
-		$this->settings = $settings;
-	}
-
 	/**
 	 * Authenticate the user.
 	 *
@@ -101,14 +86,14 @@ class Authenticator {
 	 * @throws Exception Registration is off.
 	 */
 	public function register( stdClass $user ): ?WP_User {
-		$register = true === (bool) $this->settings->registration_enabled || (bool) get_option( 'users_can_register', false );
+		$register = true === (bool) services( 'settings' )->registration_enabled || (bool) get_option( 'users_can_register', false );
 
 		if ( ! $register ) {
 			throw new Exception( esc_html__( 'Registration is not allowed.', 'google-login' ) );
 		}
 
 		try {
-			$allowed_domains = $this->settings->allowed_domains;
+			$allowed_domains = services( 'settings' )->allowed_domains;
 			if ( empty( $allowed_domains ) || $this->can_register_with_email( $user->email ) ) {
 				$uid = wp_insert_user(
 					array(
@@ -175,7 +160,7 @@ class Authenticator {
 	 * @return bool
 	 */
 	private function can_register_with_email( string $email ): bool {
-		$allowed_domains = explode( ',', $this->settings->allowed_domains );
+		$allowed_domains = explode( ',', services( 'settings' )->allowed_domains );
 		$allowed_domains = array_map( 'strtolower', $allowed_domains );
 		$allowed_domains = array_map( 'trim', $allowed_domains );
 		$email_parts = explode( '@', $email );

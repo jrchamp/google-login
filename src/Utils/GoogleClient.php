@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace GoogleLogin\Utils;
 
 use Exception;
+use function GoogleLogin\services;
 
 /**
  * Class GoogleClient
@@ -71,13 +72,13 @@ class GoogleClient {
 
 	/**
 	 * GoogleClient constructor.
-	 *
-	 * @param array $config Configuration for client.
 	 */
-	public function __construct( array $config ) {
-		$this->client_id = $config['client_id'] ?? '';
-		$this->client_secret = $config['client_secret'] ?? '';
-		$this->redirect_uri = $config['redirect_uri'] ?? '';
+	public function __construct() {
+		$settings = services( 'settings' );
+
+		$this->client_id = $settings->client_id;
+		$this->client_secret = $settings->client_secret;
+		$this->redirect_uri = wp_login_url();
 	}
 
 	/**
@@ -105,7 +106,7 @@ class GoogleClient {
 	 * @param string $code Token.
 	 */
 	public function set_access_token( string $code ): self {
-		$this->access_token = $this->access_token( $code )->access_token;
+		$this->access_token = $this->get_access_token( $code )->access_token;
 	}
 
 	/**
@@ -149,7 +150,7 @@ class GoogleClient {
 	 * @return \stdClass
 	 * @throws Exception For access token errors.
 	 */
-	public function access_token( string $code ): \stdClass {
+	public function get_access_token( string $code ): \stdClass {
 		$response = wp_remote_post(
 			self::TOKEN_URL,
 			array(
