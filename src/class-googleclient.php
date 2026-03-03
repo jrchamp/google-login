@@ -124,6 +124,11 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function authorization_url(): string {
+		// Client ID is required.
+		if ( empty( $this->client_id ) ) {
+			return '';
+		}
+
 		$scopes = array(
 			'email',
 			'profile',
