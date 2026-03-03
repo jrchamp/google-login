@@ -8,7 +8,7 @@
  * Domain Path: /languages
  * License: GPLv2+
  * Requires at least: 5.5
- * Requires PHP: 7.4
+ * Requires PHP: 7.1
  *
  * @package GoogleLogin
  * @since 1.0.0
@@ -25,10 +25,7 @@ require_once __DIR__ . '/autoloader.php';
 
 use InvalidArgumentException;
 
-/**
- * PHP 7.4+ is required in order to use the plugin.
- */
-if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
+if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
 	$hooks = array(
 		'admin_notices',
 		'network_admin_notices',
@@ -38,18 +35,16 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 		add_action(
 			$hook,
 			function () {
-				$message = __(
-					'Google Login plugin requires PHP version 7.4 or higher.',
-					'google-login'
-				);
-
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
 						'The Google Login plugin has been deactivated',
 						'google-login'
 					),
-					wp_kses( $message, array( 'br' => true ) )
+					esc_html__(
+						'The Google Login plugin requires PHP version 7.1 or higher.',
+						'google-login'
+					)
 				);
 
 				deactivate_plugins( plugin_basename( __FILE__ ) );

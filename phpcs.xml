@@ -12,10 +12,8 @@
 
 	<!-- Check for PHP and WordPress cross-version compatibility. -->
 	<config name="minimum_supported_wp_version" value="5.5.0" />
-	<config name="testVersion" value="7.4-"/>
+	<config name="testVersion" value="7.1-"/>
 	<rule ref="PHPCompatibilityWP">
-		<!-- PHP 8.1 - We don't care that the default flags for htmlspecialchars() has changed. Both defaults are acceptable. -->
-		<exclude name="PHPCompatibility.ParameterValues.NewHTMLEntitiesFlagsDefault.NotSet"/>
 	</rule>
 
 	<rule ref="WordPress">
