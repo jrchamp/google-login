@@ -202,8 +202,13 @@ class Settings {
 	 * @return void
 	 */
 	public function client_secret_field(): void {
+		if ( defined( $this->option_overrides[ 'client_secret' ] ) ) {
+			$client_secret = 'REDACTED';
+		} else {
+			$client_secret = $this->client_secret;
+		}
 		?>
-		<input type="password" size="40" name="google_login_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $this->client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
+		<input type="password" size="40" name="google_login_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
 		<?php
 	}
 
