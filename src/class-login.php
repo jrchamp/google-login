@@ -43,7 +43,6 @@ class Login {
 		/**
 		 * Actions.
 		 */
-		add_action( 'login_form', array( $this, 'login_button' ) );
 		add_action( 'wp_login', array( $this, 'login_redirect' ) );
 
 		/**
@@ -53,6 +52,7 @@ class Login {
 		add_filter( 'authenticate', array( $this, 'authenticate' ), 20 );
 		add_filter( 'google_login_redirect_url', array( $this, 'redirect_url' ) );
 		add_filter( 'google_login_state', array( $this, 'state_redirect' ) );
+		add_filter( 'login_message', array( $this, 'login_button' ) );
 	}
 
 	/**
@@ -91,13 +91,14 @@ class Login {
 	/**
 	 * Add the login button to login form.
 	 *
-	 * @return void
+	 * @param string $message Message string.
+	 * @return array
 	 */
-	public function login_button(): void {
+	public function login_button( $message ) {
 		$login_url = services( 'google_client' )->authorization_url();
 
 		if ( empty( $login_url ) ) {
-			return;
+			return $message;
 		}
 
 		if ( is_user_logged_in() ) {
@@ -108,16 +109,19 @@ class Login {
 			$button_text = __( 'Log in with Google', 'google-login' );
 		}
 
+		ob_start();
 		?>
-<div class="google_login">
-	<div class="google_login__button-container">
-		<a class="google_login__button" href="<?php echo esc_url( $button_url ); ?>">
+<div class="google_login message">
+	<div class="google_login__button-container button-group">
+		<a class="google_login__button button button-primary button-large aligncenter" rel="nofollow" href="<?php echo esc_url( $button_url ); ?>">
 			<span class="google_login__google-icon"></span>
 			<?php echo esc_html( $button_text ); ?>
 		</a>
 	</div>
 </div>
 		<?php
+		$message .= ob_get_clean();
+		return $message;
 	}
 
 	/**

@@ -203,7 +203,7 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function state(): string {
-		$state_data = apply_filters( 'google_login_state', $state_data );
+		$state_data = apply_filters( 'google_login_state', array() );
 		$state_data['nonce'] = wp_create_nonce( 'google_login' );
 		$state_data['provider'] = 'google';
 
