@@ -22,20 +22,19 @@ namespace GoogleLogin;
  * @package GoogleLogin
  */
 class Settings {
-
 	/**
 	 * Settings values.
 	 *
 	 * @var array
 	 */
-	public $options;
+	private $options;
 
 	/**
 	 * Getters for settings values.
 	 *
 	 * @var string[]
 	 */
-	private $getters = array(
+	private $option_overrides = array(
 		'client_id' => 'GOOGLE_LOGIN_CLIENT_ID',
 		'client_secret' => 'GOOGLE_LOGIN_SECRET',
 		'registration_enabled' => 'GOOGLE_LOGIN_REGISTRATION',
@@ -48,13 +47,7 @@ class Settings {
 	 * @param string $name Name of option to fetch.
 	 */
 	public function __get( string $name ) {
-		if ( isset( $this->getters[ $name ] ) ) {
-			$constant_name = $this->getters[ $name ];
-
-			return defined( $constant_name ) ? constant( $constant_name ) : ( $this->options[ $name ] ?? '' );
-		}
-
-		return null;
+		return $this->options[ $name ] ?? null;
 	}
 
 	/**
@@ -62,6 +55,10 @@ class Settings {
 	 */
 	public function __construct() {
 		$this->options = get_option( 'google_login_settings', array() );
+
+		foreach ( $this->option_overrides as $key => $constant_name ) {
+			$this->options[ $key ] = defined( $constant_name ) ? constant( $constant_name ) : ( $this->options[ $key ] ?? '' );
+		}
 
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action(
@@ -293,7 +290,7 @@ class Settings {
 	 * @return void
 	 */
 	private function disabled( string $field ): void {
-		$constant_name = $this->getters[ $field ] ?? null;
+		$constant_name = $this->option_overrides[ $field ] ?? null;
 
 		if ( isset( $constant_name ) && defined( $constant_name ) ) {
 			disabled( true );
