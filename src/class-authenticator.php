@@ -148,11 +148,7 @@ class Authenticator {
 	 */
 	private function can_register_with_email( string $email ): bool {
 		$allowed_domains = explode( ',', services( 'settings' )->allowed_domains );
-		$allowed_domains = array_map( 'strtolower', $allowed_domains );
-		$allowed_domains = array_map( 'trim', $allowed_domains );
-		$email_parts = explode( '@', $email );
-		$email_parts = array_map( 'strtolower', $email_parts );
-
-		return in_array( $email_parts[1], $allowed_domains, true );
+		list( $email_username, $email_domain ) = explode( '@', $email, 2 );
+		return in_array( $email_domain, $allowed_domains, true );
 	}
 }

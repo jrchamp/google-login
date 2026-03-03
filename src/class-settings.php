@@ -91,12 +91,45 @@ class Settings {
 	}
 
 	/**
+	 * Sanitize settings.
+	 *
+	 * @param array $input Settings array.
+	 * @return array
+	 */
+	public function sanitize_settings( $input ) {
+		// Clean up the allowed domains string before it goes in the database.
+		$allowed_domains = sanitize_text_field( $input['allowed_domains'] ?? '' );
+		$allowed_domains = strtolower( $allowed_domains );
+		$allowed_domains = explode( ',', $allowed_domains );
+		$allowed_domains = array_map( 'trim', $allowed_domains );
+		$allowed_domains = array_filter( $allowed_domains );
+		$allowed_domains = implode( ',', $allowed_domains );
+
+		return array(
+			'client_id' => sanitize_text_field( $input['client_id'] ?? '' ),
+			'client_secret' => sanitize_text_field( $input['client_secret'] ?? '' ),
+			'registration_enabled' => rest_sanitize_boolean( $input['registration_enabled'] ?? '' ),
+			'allowed_domains' => sanitize_text_field( $allowed_domains ),
+		);
+	}
+
+	/**
 	 * Register the settings, section and fields.
 	 *
 	 * @return void
 	 */
 	public function register_settings(): void {
-		register_setting( 'google_login', 'google_login_settings' );
+		register_setting(
+			'google_login',
+			'google_login_settings',
+			array(
+				'type' => 'array',
+				'description' => 'Google Login settings',
+				'sanitize_callback' => array( $this, 'sanitize_settings' ),
+				'show_in_rest' => false,
+				'default' => array(),
+			)
+		);
 
 		add_settings_section(
 			'google_login_section',
@@ -150,7 +183,7 @@ class Settings {
 	 */
 	public function client_id_field(): void {
 		?>
-		<input type="text" name="google_login_settings[client_id]" id="client-id" value="<?php echo esc_attr( $this->client_id ); ?>" autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
+		<input type="text" size="80" name="google_login_settings[client_id]" id="client-id" value="<?php echo esc_attr( $this->client_id ); ?>" autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
 		<p class="description">
 		<?php
 		echo wp_kses_post(
@@ -173,31 +206,26 @@ class Settings {
 	 */
 	public function client_secret_field(): void {
 		?>
-		<input type="password" name="google_login_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $this->client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
+		<input type="password" size="40" name="google_login_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $this->client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
 		<?php
 	}
 
 	/**
 	 * User registration field.
 	 *
-	 * This will tell us whether or not to create the user
-	 * if the user does not exist on WP application.
-	 *
-	 * This is irrespective of registration flag present in Settings > General
-	 *
 	 * @return void
 	 */
 	public function user_registration(): void {
 		?>
-		<label style="display:block;margin-top:6px;">
+		<label>
 			<input type="checkbox" name="google_login_settings[registration_enabled]" id="user-registration" value="1" <?php checked( $this->registration_enabled ); ?> <?php $this->disabled( 'registration_enabled' ); ?> />
-			<?php esc_html_e( 'Create a new user account if it does not exist already', 'google-login' ); ?>
+			<?php esc_html_e( 'Allow new account creation?', 'google-login' ); ?>
 		</label>
 		<p class="<?php echo esc_attr( 'error-message' ); ?>">
 			<?php
 			echo wp_kses_post(
 				sprintf(
-				/* translators: %1s will be replaced by page link */
+					/* translators: %1s will be replaced by page link */
 					__( 'If this setting is checked, a new user will be created even if <a target="_blank" href="%1s">membership setting</a> is off.', 'google-login' ),
 					is_multisite() ? 'network/settings.php' : 'options-general.php'
 				)
@@ -210,18 +238,15 @@ class Settings {
 	/**
 	 * Allowed domains for registration.
 	 *
-	 * Only emails belonging to these domains would be preferred
-	 * for registration.
-	 *
-	 * If left blank, all domains would be allowed.
+	 * If left blank, all domains are allowed.
 	 *
 	 * @return void
 	 */
 	public function allowed_domains(): void {
 		?>
-		<input type="text" name="google_login_settings[allowed_domains]" id="allowed_domains" value="<?php echo esc_attr( $this->allowed_domains ); ?>" autocomplete="off" <?php $this->disabled( 'allowed_domains' ); ?> />
+		<input type="text" size="40" name="google_login_settings[allowed_domains]" id="allowed_domains" value="<?php echo esc_attr( $this->allowed_domains ); ?>" autocomplete="off" <?php $this->disabled( 'allowed_domains' ); ?> />
 		<p class="description">
-			<?php echo esc_html( __( 'Use a comma to separate domains', 'google-login' ) ); ?>
+			<?php echo esc_html( __( 'Use a comma to separate domains.', 'google-login' ) ); ?>
 		</p>
 		<?php
 	}
