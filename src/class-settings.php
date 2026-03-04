@@ -118,7 +118,7 @@ class Settings {
 			'client_id' => sanitize_text_field( $input['client_id'] ?? '' ),
 			'client_secret' => sanitize_text_field( $input['client_secret'] ?? '' ),
 			'registration_enabled' => rest_sanitize_boolean( $input['registration_enabled'] ?? '' ),
-			'allowed_domains' => sanitize_text_field( $allowed_domains ),
+			'allowed_domains' => $allowed_domains,
 		);
 	}
 
@@ -241,9 +241,7 @@ class Settings {
 		<span class="<?php echo esc_attr( 'notice notice-warning' ); ?>">
 			<?php
 			echo wp_kses_post(
-				sprintf(
-					__( 'Please note: This setting allows new users to be created even if new account registration is disabled.', 'google-login' ),
-				)
+				__( 'Please note: This setting allows new users to be created even if new account registration is disabled.', 'google-login' )
 			);
 			?>
 		</span>
@@ -275,8 +273,9 @@ class Settings {
 	public function settings_page(): void {
 		if ( is_network_admin() && ! empty( $_POST['google_login_settings'] ) ) {
 			check_admin_referer( 'google_login_settings' );
-			if ( current_user_can( 'manage_network_options' )  ) {
-				update_site_option( 'google_login_settings', $this->sanitize_settings( $_POST['google_login_settings'] ) );
+			if ( current_user_can( 'manage_network_options' ) ) {
+				$clean_settings = $this->sanitize_settings( map_deep( wp_unslash( $_POST['google_login_settings'] ), 'sanitize_text_field' ) );
+				update_site_option( 'google_login_settings', $clean_settings );
 				add_settings_error( 'google_login_settings', 'google_login_updated', __( 'Settings saved.', 'google-login' ), 'updated' );
 
 				// Reload options.

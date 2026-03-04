@@ -94,12 +94,10 @@ function services( string $service ) {
 add_action(
 	'plugins_loaded',
 	function () {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
-		if ( isset( $_GET['reauth'] ) && null !== sanitize_text_field( wp_unslash( $_GET['reauth'] ) ) ) {
-			if ( ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-				wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
-				exit;
-			}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['reauth'] ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
+			wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
+			exit;
 		}
 
 		$active_modules = array(

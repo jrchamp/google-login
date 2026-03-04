@@ -159,7 +159,11 @@ class GoogleClient {
 		}
 
 		// The payload is base64url encoded, but allows us to skip the userinfo API call.
-		return json_decode( base64_decode( strtr( $parts[1], array( '-' => '+', '_' => '/' ) ) ) );
+		$replacements = array(
+			'-' => '+',
+			'_' => '/',
+		);
+		return json_decode( base64_decode( strtr( $parts[1], $replacements ) ) );
 	}
 
 	/**

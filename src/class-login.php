@@ -28,7 +28,7 @@ use function GoogleLogin\services;
  */
 class Login {
 	/**
-	 * Has been authenticated from plugin?
+	 * Was the user authenticated already?
 	 *
 	 * @var bool
 	 */
@@ -68,15 +68,16 @@ class Login {
 		$default_redirect_url = admin_url();
 
 		if ( 'wp-login.php' === $pagenow ) {
-			// If any redirect_to query parameter is available.
-			$redirect_to = filter_input( INPUT_GET, 'redirect_to', FILTER_SANITIZE_URL );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$redirect_to = sanitize_url( wp_unslash( $_GET['redirect_to'] ?? '' ) );
 
 			// In case the query parameter is available.
 			if ( ! empty( $redirect_to ) ) {
 				$default_redirect_url = $redirect_to;
 			}
 		} else {
-			$request_uri = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+			$request_uri = sanitize_url( wp_unslash( $_SERVER['request_uri'] ?? '' ) );
+
 			if ( empty( $request_uri ) ) {
 				$default_redirect_url = home_url();
 			} else {
@@ -151,14 +152,17 @@ class Login {
 			return $user;
 		}
 
-		$code = filter_input( INPUT_GET, 'code', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$code = sanitize_text_field( wp_unslash( $_GET['code'] ?? '' ) );
 
 		if ( ! $code ) {
 			return $user;
 		}
 
-		$state = filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null; // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$state = sanitize_text_field( wp_unslash( $_GET['state'] ?? '' ) );
+
+		$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;
 
 		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) || 'google' !== $decoded_state['provider'] ) {
 			return $user;
@@ -206,13 +210,9 @@ class Login {
 	 * @return array
 	 */
 	public function state_redirect( array $state ): array {
-		$redirect_to = filter_input( INPUT_GET, 'redirect_to', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		/**
-		 * Filter the default redirect URL in case redirect_to param is not available.
-		 * Default to admin URL.
-		 *
-		 * @param string $admin_url Admin URL address.
-		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$redirect_to = sanitize_url( wp_unslash( $_GET['redirect_to'] ?? '' ) );
+
 		$state['redirect_to'] = $redirect_to ?? admin_url();
 
 		return $state;
@@ -224,9 +224,14 @@ class Login {
 	 * @return void
 	 */
 	public function login_redirect(): void {
-		$state = filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! $this->authenticated ) {
+			return;
+		}
 
-		if ( ! $state || ! $this->authenticated ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$state = sanitize_text_field( wp_unslash( $_GET['state'] ?? '' ) );
+
+		if ( ! $state ) {
 			return;
 		}
 
