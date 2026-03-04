@@ -25,31 +25,24 @@ require_once __DIR__ . '/autoloader.php';
 use InvalidArgumentException;
 
 if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
-	$hooks = array(
-		'admin_notices',
-		'network_admin_notices',
-	);
-
-	foreach ( $hooks as $hook ) {
-		add_action(
-			$hook,
-			function () {
-				printf(
-					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
-					esc_html__(
-						'The Sign in with Google plugin has been deactivated',
-						'signin-google'
-					),
-					esc_html__(
-						'The Sign in with Google plugin requires PHP version 7.1 or higher.',
-						'signin-google'
-					)
-				);
-
-				deactivate_plugins( plugin_basename( __FILE__ ) );
-			}
+	$signin_google_notice = function () {
+		printf(
+			'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
+			esc_html__(
+				'The Sign in with Google plugin has been deactivated',
+				'signin-google'
+			),
+			esc_html__(
+				'The Sign in with Google plugin requires PHP version 7.1 or higher.',
+				'signin-google'
+			)
 		);
-	}
+
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+	};
+
+	add_action( 'admin_notices', $signin_google_notice );
+	add_action( 'network_admin_notices', $signin_google_notice );
 
 	return;
 }

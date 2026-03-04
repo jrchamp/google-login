@@ -1,6 +1,7 @@
 # Files that should not be copied to SVN.
 .distignore
 .git/
+.gitignore
 .github
 composer.json
 composer.lock
