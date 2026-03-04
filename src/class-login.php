@@ -153,7 +153,7 @@ class Login {
 		}
 
 		try {
-			services( 'google_client' )->set_access_token( $code );
+			services( 'google_client' )->set_token( $code );
 			$user = services( 'google_client' )->user();
 			$user = services( 'authenticator' )->authenticate( $user );
 

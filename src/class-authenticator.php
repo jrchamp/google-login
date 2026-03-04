@@ -39,8 +39,12 @@ class Authenticator {
 	 * @throws InvalidArgumentException For invalid registrations.
 	 */
 	public function authenticate( stdClass $user ): WP_User {
-		if ( ! property_exists( $user, 'email' ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Email needs to be present for the user.', 'google-login' ) );
+		if ( empty( $user->email ) ) {
+			throw new InvalidArgumentException( esc_html__( 'No email address found.', 'google-login' ) );
+		}
+
+		if ( empty( $user->email_verified ) ) {
+			throw new InvalidArgumentException( esc_html__( 'Unverified email address.', 'google-login' ) );
 		}
 
 		if ( email_exists( $user->email ) ) {

@@ -29,18 +29,11 @@ class GoogleClient {
 	const AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth';
 
 	/**
-	 * Access Token URL.
+	 * Token URL.
 	 *
 	 * @var string
 	 */
 	const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-
-	/**
-	 * API base for google.
-	 *
-	 * @var string
-	 */
-	const API_BASE = 'https://www.googleapis.com';
 
 	/**
 	 * Client ID.
@@ -64,11 +57,11 @@ class GoogleClient {
 	private $redirect_uri;
 
 	/**
-	 * Access token.
+	 * ID token.
 	 *
 	 * @var string
 	 */
-	private $access_token;
+	private $id_token;
 
 	/**
 	 * GoogleClient constructor.
@@ -82,12 +75,13 @@ class GoogleClient {
 	}
 
 	/**
-	 * Set access token.
+	 * Set token.
 	 *
 	 * @param string $code Token.
 	 */
-	public function set_access_token( string $code ) {
-		$this->access_token = $this->get_access_token( $code )->access_token;
+	public function set_token( string $code ) {
+		$tokens = $this->get_token( $code );
+		$this->id_token = $tokens->id_token;
 	}
 
 	/**
@@ -129,14 +123,14 @@ class GoogleClient {
 	}
 
 	/**
-	 * Get the access token.
+	 * Get the token.
 	 *
 	 * @param string $code Response code received during authorization.
 	 *
 	 * @return \stdClass
-	 * @throws Exception For access token errors.
+	 * @throws Exception For token errors.
 	 */
-	private function get_access_token( string $code ): \stdClass {
+	private function get_token( string $code ): \stdClass {
 		$response = wp_remote_post(
 			self::TOKEN_URL,
 			array(
@@ -154,37 +148,31 @@ class GoogleClient {
 		);
 
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the access token, please try again.', 'google-login' ) );
+			throw new Exception( esc_html__( 'Could not retrieve the token, please try again.', 'google-login' ) );
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 
 	/**
-	 * Make an API request.
+	 * Build a user object from the token.
 	 *
 	 * @return \stdClass
-	 * @throws Exception API Exception.
+	 * @throws Exception For token errors.
 	 */
 	public function user(): \stdClass {
-		if ( empty( $this->access_token ) ) {
-			throw new Exception( esc_html__( 'Access token must be set to make this API call', 'google-login' ) );
+		if ( empty( $this->id_token ) ) {
+			throw new Exception( esc_html__( 'Token was not found.', 'google-login' ) );
 		}
 
-		$user = wp_remote_get(
-			trailingslashit( self::API_BASE ) . 'oauth2/v2/userinfo?access_token=' . $this->access_token,
-			array(
-				'headers' => array(
-					'Accept' => 'application/json',
-				),
-			)
-		);
+		$parts = explode( '.', $this->id_token );
 
-		if ( 200 !== wp_remote_retrieve_response_code( $user ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'google-login' ) );
+		if ( count( $parts ) !== 3 ) {
+			throw new Exception( esc_html__( 'Token is invalid.', 'google-login' ) );
 		}
 
-		return json_decode( wp_remote_retrieve_body( $user ) );
+		// The payload is base64url encoded, but allows us to skip the userinfo API call.
+		return json_decode( base64_decode( strtr( $parts[1], array( '-' => '+', '_' => '/' ) ) ) );
 	}
 
 	/**
