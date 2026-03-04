@@ -12,22 +12,22 @@ Minimal plugin that allows WordPress users to log in using Google.
 
 == Description ==
 
-Minimal plugin to let your users login to WordPress using their Google accounts.
+Minimal plugin to let your users log in to WordPress using their Google accounts.
 
 ### Initial Setup
 
-1. Create a project from [Google Developers Console](https://console.developers.google.com/apis/dashboard) if none exists.
+1. Create a project on the [Google Developers Console](https://console.developers.google.com/apis/dashboard).
 
 
-2. Go to **Credentials** tab, then create credential for OAuth client.
-    * Application type will be **Web Application**
-    * Add `YOUR_DOMAIN/wp-login.php` in **Authorized redirect URIs**
+2. Go to the **Credentials** tab, then create OAuth client.
+   * Application type will be **Web Application**
+   * Add `YOUR_DOMAIN/wp-login.php` in **Authorized redirect URIs**
 
 
 3. This will give you **Client ID** and **Secret key**.
 
 
-4. Input these values either in `WP Admin > Settings > Sign in with Google`, or in `wp-config.php` using the following code snippet:
+4. Input these values in `Settings > Sign in with Google`, or in `wp-config.php` using the following code snippet:
 
 ```
 define( 'SIGNIN_GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID' );
@@ -39,17 +39,13 @@ define( 'SIGNIN_GOOGLE_SECRET', 'YOUR_SECRET_KEY' );
 You can enable user registration either by
 - Enabling *Settings > Sign in with Google > Enable Registration*
 
-
 OR
-
 
 - Adding
 ```
 define( 'SIGNIN_GOOGLE_REGISTRATION', 'true' );
 ```
 in wp-config.php file.
-
-**Note:** If the checkbox is ON then, it will register valid Google users even when the WordPress setting to allow new user registration is OFF.
 
 ### Restrict user registration to one or more domain(s)
 
