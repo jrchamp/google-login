@@ -1,0 +1,9 @@
+# Files that should not be copied to SVN.
+.distignore
+.git/
+.github
+composer.json
+composer.lock
+phpcs.xml
+README.md
+vendor/
