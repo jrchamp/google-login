@@ -1,5 +1,5 @@
 === Sign in with Google ===
-Contributors: jrchamp, rtCamp, sh4lin, nikhiljoshua, mchirag2002, mi5t4n
+Contributors: jrchamp, rtCamp
 Tags: sso, oauth, authentication, google, login
 Requires at least: 5.5
 Tested up to: 6.9
@@ -74,7 +74,7 @@ define( 'SIGNIN_GOOGLE_DOMAINS', 'example.com,wordpress.org' );
 == Changelog ==
 
 = 1.0.0 =
-Forked from rtCamp's Login with Google plugin.
+Forked from rtCamp's Login with Google plugin (thank you!).
 Support for WordPress multisite (network configuration level)
 Streamlined (no external depenencies, no build system, a single API call)
 
