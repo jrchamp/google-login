@@ -1,24 +1,23 @@
 <?php
 /**
- * Plugin Name: Google Login
+ * Plugin Name: Sign in with Google
  * Description: Authenticate users with Google.
  * Version: 1.0.0
  * Author: Jonathan Champ, rtCamp
- * Text Domain: google-login
+ * Text Domain: signin-google
  * Domain Path: /languages
  * License: GPLv2+
  * Requires at least: 5.5
  * Requires PHP: 7.1
  *
- * @package GoogleLogin
+ * @package signin-google
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace GoogleLogin;
+namespace SigninGoogle;
 
-// Prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/autoloader.php';
@@ -38,12 +37,12 @@ if ( version_compare( PHP_VERSION, '7.1', '<' ) ) {
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
-						'The Google Login plugin has been deactivated',
-						'google-login'
+						'The Sign in with Google plugin has been deactivated',
+						'signin-google'
 					),
 					esc_html__(
-						'The Google Login plugin requires PHP version 7.1 or higher.',
-						'google-login'
+						'The Sign in with Google plugin requires PHP version 7.1 or higher.',
+						'signin-google'
 					)
 				);
 
@@ -96,7 +95,7 @@ add_action(
 	function () {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['reauth'] ) && ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-			wp_safe_redirect( wp_login_url(), 302, 'Google Login' );
+			wp_safe_redirect( wp_login_url(), 302, 'Sign in with Google' );
 			exit;
 		}
 
@@ -115,7 +114,7 @@ add_action(
 add_action(
 	'init',
 	function () {
-		load_plugin_textdomain( 'google-login', false, plugin_basename( __DIR__ ) . '/languages' );
+		load_plugin_textdomain( 'signin-google', false, plugin_basename( __DIR__ ) . '/languages' );
 	}
 );
 
@@ -132,8 +131,8 @@ add_filter(
 			'settings' => sprintf(
 				/* translators: %1$s: Setting name, %2$s: URL for settings page link. */
 				'<a href="%1$s">%2$s</a>',
-				esc_url( admin_url( 'options-general.php?page=google-login' ) ),
-				esc_html__( 'Settings', 'google-login' )
+				esc_url( admin_url( 'options-general.php?page=signin-google' ) ),
+				esc_html__( 'Settings', 'signin-google' )
 			),
 		);
 

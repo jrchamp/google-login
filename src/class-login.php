@@ -2,29 +2,31 @@
 /**
  * Login class.
  *
- * This will manage the login flow, which includes adding the
- * google login button on wp-login page, authorizing the user,
- * authenticating user and redirecting him to admin.
+ * Manages the login flow:
+ *  - adding the login button on wp-login page,
+ *  - authorizing the user,
+ *  - authenticating user
+ *  - redirecting them to the WordPress admin.
  *
- * @package GoogleLogin
+ * @package signin-google
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace GoogleLogin;
+namespace SigninGoogle;
+
+defined( 'ABSPATH' ) || exit;
 
 use WP_User;
 use WP_Error;
 use stdClass;
 use Throwable;
 use Exception;
-use function GoogleLogin\services;
+use function SigninGoogle\services;
 
 /**
  * Class Login.
- *
- * @package GoogleLogin
  */
 class Login {
 	/**
@@ -50,8 +52,8 @@ class Login {
 		 */
 		// Priority is 20 because of issue: https://core.trac.wordpress.org/ticket/46748.
 		add_filter( 'authenticate', array( $this, 'authenticate' ), 20 );
-		add_filter( 'google_login_redirect_url', array( $this, 'redirect_url' ) );
-		add_filter( 'google_login_state', array( $this, 'state_redirect' ) );
+		add_filter( 'signin_google_redirect_url', array( $this, 'redirect_url' ) );
+		add_filter( 'signin_google_state', array( $this, 'state_redirect' ) );
 	}
 
 	/**
@@ -99,18 +101,18 @@ class Login {
 		}
 
 		if ( is_user_logged_in() ) {
-			$button_text = __( 'Log out', 'google-login' );
+			$button_text = __( 'Log out', 'signin-google' );
 			$button_url = wp_logout_url( $this->get_redirect_url() );
 		} else {
 			$button_url = $login_url;
-			$button_text = __( 'Sign in with Google', 'google-login' );
+			$button_text = __( 'Sign in with Google', 'signin-google' );
 		}
 		?>
-		<div class="google-login-wrapper">
+		<div class="signin-google-wrapper">
 			<a rel="nofollow" href="<?php echo esc_url( $button_url ); ?>">
-				<button class="google-login-button">
-					<div class="google-login-button-content">
-						<div class="google-login-button-icon">
+				<button class="signin-google-button">
+					<div class="signin-google-button-content">
+						<div class="signin-google-button-icon">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
 								<path fill="#ea4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5"/>
 								<path fill="#4285f4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65"/>
@@ -119,7 +121,7 @@ class Login {
 								<path fill="none" d="M0 0h48v48H0z"/>
 							</svg>
 						</div>
-						<span class="google-login-button-text"><?php echo esc_html( $button_text ); ?></span>
+						<span class="signin-google-button-text"><?php echo esc_html( $button_text ); ?></span>
 					</div>
 				</button>
 			</a>
@@ -132,7 +134,7 @@ class Login {
 	 */
 	public function login_scripts() {
 		wp_enqueue_style(
-			'google-login-css',
+			'signin-google-css',
 			plugins_url( 'assets/login.css', __DIR__ ),
 			array( 'login' ),
 			'1.0.0'
@@ -168,7 +170,7 @@ class Login {
 			return $user;
 		}
 
-		if ( empty( $decoded_state['nonce'] ) || ! wp_verify_nonce( $decoded_state['nonce'], 'google_login' ) ) {
+		if ( empty( $decoded_state['nonce'] ) || ! wp_verify_nonce( $decoded_state['nonce'], 'signin_google' ) ) {
 			return $user;
 		}
 
@@ -181,10 +183,10 @@ class Login {
 				return $user;
 			}
 
-			throw new Exception( __( 'Could not authenticate the user, please try again.', 'google-login' ) );
+			throw new Exception( __( 'Could not authenticate the user, please try again.', 'signin-google' ) );
 
 		} catch ( Throwable $e ) {
-			return new WP_Error( 'google_login_failed', $e->getMessage() );
+			return new WP_Error( 'signin_google_failed', $e->getMessage() );
 		}
 	}
 
@@ -239,7 +241,7 @@ class Login {
 		$state = $state ? json_decode( $state ) : null;
 
 		if ( ( $state instanceof stdClass ) && ! empty( $state->provider ) && 'google' === $state->provider && ! empty( $state->redirect_to ) ) {
-			wp_safe_redirect( $state->redirect_to, 302, 'Google Login' );
+			wp_safe_redirect( $state->redirect_to, 302, 'Sign in with Google' );
 			exit;
 		}
 	}

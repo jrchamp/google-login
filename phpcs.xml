@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<ruleset name="Google Login">
+<ruleset name="Sign in with Google">
 	<arg value="s"/>
 	<arg name="extensions" value="php"/>
 	<file>.</file>
@@ -22,7 +22,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="google-login" />
+				<element value="signin-google" />
 			</property>
 		</properties>
 	</rule>

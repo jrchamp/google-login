@@ -1,17 +1,17 @@
 <?php
 /**
- * Autoloader for google-login.
+ * Autoloader for signin-google.
  *
- * @package google-login
+ * @package signin-google
  */
 
 spl_autoload_register(
 	function ( $class_name ) {
 		static $class_map = array(
-			'GoogleLogin\\Authenticator' => __DIR__ . '/src/class-authenticator.php',
-			'GoogleLogin\\GoogleClient' => __DIR__ . '/src/class-googleclient.php',
-			'GoogleLogin\\Login' => __DIR__ . '/src/class-login.php',
-			'GoogleLogin\\Settings' => __DIR__ . '/src/class-settings.php',
+			'SigninGoogle\\Authenticator' => __DIR__ . '/src/class-authenticator.php',
+			'SigninGoogle\\GoogleClient' => __DIR__ . '/src/class-googleclient.php',
+			'SigninGoogle\\Login' => __DIR__ . '/src/class-login.php',
+			'SigninGoogle\\Settings' => __DIR__ . '/src/class-settings.php',
 		);
 
 		if ( isset( $class_map[ $class_name ] ) ) {

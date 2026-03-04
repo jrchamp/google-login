@@ -1,11 +1,11 @@
 {
-	"name": "jrchamp/google-login",
+	"name": "jrchamp/signin-google",
 	"type": "wordpress-plugin",
 	"description": "Google authentication plugin for WordPress",
-	"homepage": "https://github.com/jrchamp/google-login",
+	"homepage": "https://github.com/jrchamp/signin-google",
 	"license": "GPL-2.0-or-later",
 	"support": {
-		"issues": "https://github.com/jrchamp/google-login/issues"
+		"issues": "https://github.com/jrchamp/signin-google/issues"
 	},
 	"require": {},
 	"require-dev" : {

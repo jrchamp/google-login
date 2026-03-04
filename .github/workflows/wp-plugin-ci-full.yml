@@ -34,11 +34,11 @@ jobs:
 
     - name: Build plugin
       run: |
-        wp dist-archive . ./google-login.zip
+        wp dist-archive . ./signin-google.zip
         mkdir tmp-build
-        unzip google-login.zip -d tmp-build
+        unzip signin-google.zip -d tmp-build
 
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
       with:
-        build-dir: './tmp-build/google-login'
+        build-dir: './tmp-build/signin-google'

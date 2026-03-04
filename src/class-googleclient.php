@@ -4,22 +4,22 @@
  *
  * Useful for authenticating the user and other API related operations.
  *
- * @package GoogleLogin
+ * @package signin-google
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace GoogleLogin;
+namespace SigninGoogle;
+
+defined( 'ABSPATH' ) || exit;
 
 use Exception;
 use stdClass;
-use function GoogleLogin\services;
+use function SigninGoogle\services;
 
 /**
  * Class GoogleClient
- *
- * @package GoogleLogin
  */
 class GoogleClient {
 	/**
@@ -74,7 +74,7 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function get_redirect_url(): string {
-		return apply_filters( 'google_login_redirect_url', $this->redirect_uri );
+		return apply_filters( 'signin_google_redirect_url', $this->redirect_uri );
 	}
 
 	/**
@@ -132,7 +132,7 @@ class GoogleClient {
 		);
 
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the token, please try again.', 'google-login' ) );
+			throw new Exception( esc_html__( 'Could not retrieve the token, please try again.', 'signin-google' ) );
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
@@ -149,13 +149,13 @@ class GoogleClient {
 		$tokens = $this->get_token( $code );
 
 		if ( empty( $tokens->id_token ) ) {
-			throw new Exception( esc_html__( 'Token was not found.', 'google-login' ) );
+			throw new Exception( esc_html__( 'Token was not found.', 'signin-google' ) );
 		}
 
 		$parts = explode( '.', $tokens->id_token );
 
 		if ( count( $parts ) !== 3 ) {
-			throw new Exception( esc_html__( 'Token is invalid.', 'google-login' ) );
+			throw new Exception( esc_html__( 'Token is invalid.', 'signin-google' ) );
 		}
 
 		// The payload is base64url encoded, but allows us to skip the userinfo API call.
@@ -172,8 +172,8 @@ class GoogleClient {
 	 * @return string
 	 */
 	private function state(): string {
-		$state_data = apply_filters( 'google_login_state', array() );
-		$state_data['nonce'] = wp_create_nonce( 'google_login' );
+		$state_data = apply_filters( 'signin_google_state', array() );
+		$state_data['nonce'] = wp_create_nonce( 'signin_google' );
 		$state_data['provider'] = 'google';
 
 		return base64_encode( wp_json_encode( $state_data ) );

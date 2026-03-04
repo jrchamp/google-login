@@ -1,8 +1,8 @@
-# Google Login
+# Sign in with Google
 
-> WordPress authentication plugin for Google Login
+> WordPress plugin to use Google authentication
 
-- [Google Login](#google-login)
+- [Sign in with Google](#signin-google)
   - [Overview](#overview)
   - [Installation](#installation)
   - [Usage Instructions](#usage-instructions)
@@ -10,9 +10,8 @@
 
 ## Overview
 
-Google Login provides seamless experience for users to login in to WordPress
-sites using their Google account. No need to manually create accounts or remember quirky
-passwords.
+Sign in with Google provides a seamless experience for users to login in to WordPress
+sites using their Google account. No need to manually create accounts or remember passwords.
 
 ## Installation
 
@@ -26,7 +25,7 @@ passwords.
 2. `Authorization callback URL` should be like `https://example.com/wp-login.php` and the `Authorized JavaScript origins` should be `https://example.com` where
 `https://example.com` is replaced by your site URL.
 3. Once you create the app, you will receive the `Client ID` and `Client Secret`, add these credentials
-in `Settings > Google Login` settings page in their respective fields.
+in `Settings > Sign in with Google` settings page in their respective fields.
 4. `Allow New Users` allows new user registration independent of the `Membership` settings in
    `Settings > General`; as sometimes enabling user registration can lead to lots of spam users.
    This setting is the only setting way to allow users to be registered by this plugin.
@@ -43,12 +42,12 @@ file.
 
 Refer following list of constants.
 
-|                           | Type    | Description                                                                                                    |
-|---------------------------|---------|----------------------------------------------------------------------------------------------------------------|
-| GOOGLE_LOGIN_CLIENT_ID    | String  | Google client ID of your application.                                                                          |
-| GOOGLE_LOGIN_SECRET       | String  | Secret key of your application                                                                                 |
-| GOOGLE_LOGIN_REGISTRATION | Boolean | (Optional) Enable new user registration? If not set, inherits from `Settings > General Settings > Membership`. |
-| GOOGLE_LOGIN_DOMAINS      | String  | (Optional) Comma-separated list of allowed domain names. If empty, all domains are allowed.                    |
+|                            | Type    | Description                                                                                                    |
+|----------------------------|---------|----------------------------------------------------------------------------------------------------------------|
+| SIGNIN_GOOGLE_CLIENT_ID    | String  | Google client ID of your application.                                                                          |
+| SIGNIN_GOOGLE_SECRET       | String  | Secret key of your application                                                                                 |
+| SIGNIN_GOOGLE_REGISTRATION | Boolean | (Optional) Enable new user registration? If not set, inherits from `Settings > General Settings > Membership`. |
+| SIGNIN_GOOGLE_DOMAINS      | String  | (Optional) Comma-separated list of allowed domain names. If empty, all domains are allowed.                    |
 
 These constants can also be configured via [wp-cli](https://developer.wordpress.org/cli/commands/config/).
 

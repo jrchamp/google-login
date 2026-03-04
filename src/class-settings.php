@@ -3,13 +3,15 @@
  * Register the settings under settings page and also
  * provide the interface to retrieve the settings.
  *
- * @package GoogleLogin
+ * @package signin-google
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace GoogleLogin;
+namespace SigninGoogle;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Class Settings.
@@ -18,8 +20,6 @@ namespace GoogleLogin;
  * @property string|null client_id
  * @property string|null client_secret
  * @property bool|null registration_enabled
- *
- * @package GoogleLogin
  */
 class Settings {
 	/**
@@ -35,10 +35,10 @@ class Settings {
 	 * @var string[]
 	 */
 	private $option_overrides = array(
-		'client_id' => 'GOOGLE_LOGIN_CLIENT_ID',
-		'client_secret' => 'GOOGLE_LOGIN_SECRET',
-		'registration_enabled' => 'GOOGLE_LOGIN_REGISTRATION',
-		'allowed_domains' => 'GOOGLE_LOGIN_DOMAINS',
+		'client_id' => 'SIGNIN_GOOGLE_CLIENT_ID',
+		'client_secret' => 'SIGNIN_GOOGLE_SECRET',
+		'registration_enabled' => 'SIGNIN_GOOGLE_REGISTRATION',
+		'allowed_domains' => 'SIGNIN_GOOGLE_DOMAINS',
 	);
 
 	/**
@@ -64,10 +64,10 @@ class Settings {
 				function () {
 					add_submenu_page(
 						'settings.php',
-						__( 'Google Login settings', 'google-login' ),
-						__( 'Google Login', 'google-login' ),
+						__( 'Sign in with Google settings', 'signin-google' ),
+						__( 'Sign in with Google', 'signin-google' ),
 						'manage_network_options',
-						'google-login',
+						'signin-google',
 						array( $this, 'settings_page' )
 					);
 				}
@@ -77,10 +77,10 @@ class Settings {
 				'admin_menu',
 				function () {
 					add_options_page(
-						__( 'Google Login settings', 'google-login' ),
-						__( 'Google Login', 'google-login' ),
+						__( 'Sign in with Google settings', 'signin-google' ),
+						__( 'Sign in with Google', 'signin-google' ),
 						'manage_options',
-						'google-login',
+						'signin-google',
 						array( $this, 'settings_page' )
 					);
 				}
@@ -92,7 +92,7 @@ class Settings {
 	 * Load options.
 	 */
 	private function load_options() {
-		$this->options = get_site_option( 'google_login_settings', array() );
+		$this->options = get_site_option( 'signin_google_settings', array() );
 
 		foreach ( $this->option_overrides as $key => $constant_name ) {
 			$this->options[ $key ] = defined( $constant_name ) ? constant( $constant_name ) : ( $this->options[ $key ] ?? '' );
@@ -129,11 +129,11 @@ class Settings {
 	 */
 	public function register_settings(): void {
 		register_setting(
-			'google_login',
-			'google_login_settings',
+			'signin_google',
+			'signin_google_settings',
 			array(
 				'type' => 'array',
-				'description' => 'Google Login settings',
+				'description' => 'Sign in with Google settings',
 				'sanitize_callback' => array( $this, 'sanitize_settings' ),
 				'show_in_rest' => false,
 				'default' => array(
@@ -143,46 +143,46 @@ class Settings {
 		);
 
 		add_settings_section(
-			'google_login_section',
-			__( 'Google Login Settings', 'google-login' ),
+			'signin_google_section',
+			__( 'Sign in with Google settings', 'signin-google' ),
 			function () {
 			},
-			'google-login'
+			'signin-google'
 		);
 
 		add_settings_field(
-			'google_login_client_id',
-			__( 'Client ID', 'google-login' ),
+			'signin_google_client_id',
+			__( 'Client ID', 'signin-google' ),
 			array( $this, 'client_id_field' ),
-			'google-login',
-			'google_login_section',
+			'signin-google',
+			'signin_google_section',
 			array( 'label_for' => 'client-id' )
 		);
 
 		add_settings_field(
-			'google_login_client_secret',
-			__( 'Client Secret', 'google-login' ),
+			'signin_google_client_secret',
+			__( 'Client Secret', 'signin-google' ),
 			array( $this, 'client_secret_field' ),
-			'google-login',
-			'google_login_section',
+			'signin-google',
+			'signin_google_section',
 			array( 'label_for' => 'client-secret' )
 		);
 
 		add_settings_field(
-			'google_login_registration',
-			__( 'Allow New Users', 'google-login' ),
+			'signin_google_registration',
+			__( 'Allow New Users', 'signin-google' ),
 			array( $this, 'user_registration' ),
-			'google-login',
-			'google_login_section',
+			'signin-google',
+			'signin_google_section',
 			array( 'label_for' => 'user-registration' )
 		);
 
 		add_settings_field(
-			'google_login_domains',
-			__( 'Allowed Domains', 'google-login' ),
+			'signin_google_domains',
+			__( 'Allowed Domains', 'signin-google' ),
 			array( $this, 'allowed_domains' ),
-			'google-login',
-			'google_login_section',
+			'signin-google',
+			'signin_google_section',
 			array( 'label_for' => 'allowed_domains' )
 		);
 	}
@@ -194,13 +194,13 @@ class Settings {
 	 */
 	public function client_id_field(): void {
 		?>
-		<input type="text" size="80" name="google_login_settings[client_id]" id="client-id" value="<?php echo esc_attr( $this->client_id ); ?>" autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
+		<input type="text" size="80" name="signin_google_settings[client_id]" id="client-id" value="<?php echo esc_attr( $this->client_id ); ?>" autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
 		<p class="description">
 		<?php
 		echo wp_kses_post(
 			sprintf(
 				'<p>%1s <a target="_blank" href="%2s">%3s</a>.</p>',
-				esc_html__( 'Create OAuth Client ID and Client Secret at', 'google-login' ),
+				esc_html__( 'Create OAuth Client ID and Client Secret at', 'signin-google' ),
 				'https://console.developers.google.com/apis/dashboard',
 				'console.developers.google.com'
 			)
@@ -222,7 +222,7 @@ class Settings {
 			$client_secret = $this->client_secret;
 		}
 		?>
-		<input type="password" size="40" name="google_login_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
+		<input type="password" size="40" name="signin_google_settings[client_secret]" id="client-secret" value="<?php echo esc_attr( $client_secret ); ?>" autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
 		<?php
 	}
 
@@ -234,14 +234,14 @@ class Settings {
 	public function user_registration(): void {
 		?>
 		<label>
-			<input type="checkbox" name="google_login_settings[registration_enabled]" id="user-registration" value="1" <?php checked( $this->registration_enabled ); ?> <?php $this->disabled( 'registration_enabled' ); ?> />
-			<?php esc_html_e( 'Allow new account creation?', 'google-login' ); ?>
+			<input type="checkbox" name="signin_google_settings[registration_enabled]" id="user-registration" value="1" <?php checked( $this->registration_enabled ); ?> <?php $this->disabled( 'registration_enabled' ); ?> />
+			<?php esc_html_e( 'Allow new account creation?', 'signin-google' ); ?>
 		</label>
 		<p>
 		<span class="<?php echo esc_attr( 'notice notice-warning' ); ?>">
 			<?php
 			echo wp_kses_post(
-				__( 'Please note: This setting allows new users to be created even if new account registration is disabled.', 'google-login' )
+				__( 'Please note: This setting allows new users to be created even if new account registration is disabled.', 'signin-google' )
 			);
 			?>
 		</span>
@@ -258,9 +258,9 @@ class Settings {
 	 */
 	public function allowed_domains(): void {
 		?>
-		<input type="text" size="40" name="google_login_settings[allowed_domains]" id="allowed_domains" value="<?php echo esc_attr( $this->allowed_domains ); ?>" autocomplete="off" <?php $this->disabled( 'allowed_domains' ); ?> />
+		<input type="text" size="40" name="signin_google_settings[allowed_domains]" id="allowed_domains" value="<?php echo esc_attr( $this->allowed_domains ); ?>" autocomplete="off" <?php $this->disabled( 'allowed_domains' ); ?> />
 		<p class="description">
-			<?php echo esc_html( __( 'Use a comma to separate domains.', 'google-login' ) ); ?>
+			<?php echo esc_html( __( 'Use a comma to separate domains.', 'signin-google' ) ); ?>
 		</p>
 		<?php
 	}
@@ -271,12 +271,12 @@ class Settings {
 	 * @return void
 	 */
 	public function settings_page(): void {
-		if ( is_network_admin() && ! empty( $_POST['google_login_settings'] ) ) {
-			check_admin_referer( 'google_login_settings' );
+		if ( is_network_admin() && ! empty( $_POST['signin_google_settings'] ) ) {
+			check_admin_referer( 'signin_google_settings' );
 			if ( current_user_can( 'manage_network_options' ) ) {
-				$clean_settings = $this->sanitize_settings( map_deep( wp_unslash( $_POST['google_login_settings'] ), 'sanitize_text_field' ) );
-				update_site_option( 'google_login_settings', $clean_settings );
-				add_settings_error( 'google_login_settings', 'google_login_updated', __( 'Settings saved.', 'google-login' ), 'updated' );
+				$clean_settings = $this->sanitize_settings( map_deep( wp_unslash( $_POST['signin_google_settings'] ), 'sanitize_text_field' ) );
+				update_site_option( 'signin_google_settings', $clean_settings );
+				add_settings_error( 'signin_google_settings', 'signin_google_updated', __( 'Settings saved.', 'signin-google' ), 'updated' );
 
 				// Reload options.
 				$this->load_options();
@@ -286,15 +286,15 @@ class Settings {
 		<div class="wrap">
 		<form method="post">
 			<?php
-			settings_errors( 'google_login_settings' );
+			settings_errors( 'signin_google_settings' );
 
 			if ( is_network_admin() ) {
-				wp_nonce_field( 'google_login_settings' );
+				wp_nonce_field( 'signin_google_settings' );
 			} else {
-				settings_fields( 'google_login' );
+				settings_fields( 'signin_google' );
 			}
 
-			do_settings_sections( 'google-login' );
+			do_settings_sections( 'signin-google' );
 			submit_button();
 			?>
 		</form>

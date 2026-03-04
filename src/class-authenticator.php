@@ -2,29 +2,28 @@
 /**
  * Authenticator class.
  *
- * This will authenticate the user. Also responsible for registration
- * in case it is enabled in the settings.
+ * Authenticates and registers the user.
  *
- * @package GoogleLogin
+ * @package signin-google
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace GoogleLogin;
+namespace SigninGoogle;
+
+defined( 'ABSPATH' ) || exit;
 
 use WP_User;
 use stdClass;
 use Exception;
 use Throwable;
 use InvalidArgumentException;
-use GoogleLogin\Settings;
-use function GoogleLogin\services;
+use SigninGoogle\Settings;
+use function SigninGoogle\services;
 
 /**
  * Class Authenticator
- *
- * @package GoogleLogin
  */
 class Authenticator {
 	/**
@@ -40,11 +39,11 @@ class Authenticator {
 	 */
 	public function authenticate( stdClass $user ): WP_User {
 		if ( empty( $user->email ) ) {
-			throw new InvalidArgumentException( esc_html__( 'No email address found.', 'google-login' ) );
+			throw new InvalidArgumentException( esc_html__( 'No email address found.', 'signin-google' ) );
 		}
 
 		if ( empty( $user->email_verified ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Unverified email address.', 'google-login' ) );
+			throw new InvalidArgumentException( esc_html__( 'Unverified email address.', 'signin-google' ) );
 		}
 
 		if ( email_exists( $user->email ) ) {
@@ -93,7 +92,7 @@ class Authenticator {
 		$register = (bool) services( 'settings' )->registration_enabled;
 
 		if ( ! $register ) {
-			throw new Exception( esc_html__( 'Registration is not allowed.', 'google-login' ) );
+			throw new Exception( esc_html__( 'Registration is not allowed.', 'signin-google' ) );
 		}
 
 		try {
@@ -116,7 +115,7 @@ class Authenticator {
 			}
 
 			/* translators: %s is replaced with email ID of user trying to register */
-			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'google-login' ), $user->email ) );
+			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'signin-google' ), $user->email ) );
 		} catch ( Throwable $e ) {
 			throw $e;
 		}

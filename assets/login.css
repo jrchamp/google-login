@@ -1,10 +1,10 @@
-.google-login-wrapper {
+.signin-google-wrapper {
 	width: 320px;
 	text-align: center;
 	margin: 20px auto;
 }
 
-.google-login-button {
+.signin-google-button {
 	background-color: white;
 	background-image: none;
 	border: 1px solid #747775;
@@ -29,18 +29,18 @@
 	min-width: min-content;
 }
 
-.google-login-button:hover {
+.signin-google-button:hover {
 	box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
 }
 
-.google-login-button-icon {
+.signin-google-button-icon {
 	height: 20px;
 	margin-right: 10px;
 	min-width: 20px;
 	width: 20px;
 }
 
-.google-login-button-content {
+.signin-google-button-content {
 	align-items: center;
 	display: flex;
 	flex-direction: row;
@@ -51,7 +51,7 @@
 	width: 100%;
 }
 
-.google-login-button-text {
+.signin-google-button-text {
 	flex-grow: 1;
 	font-family: 'Roboto', arial, sans-serif;
 	font-weight: 500;
