@@ -1,0 +1,20 @@
+{
+	"name": "jrchamp/google-login",
+	"type": "wordpress-plugin",
+	"description": "Google authentication plugin for WordPress",
+	"homepage": "https://github.com/jrchamp/google-login",
+	"license": "GPL-2.0-or-later",
+	"support": {
+		"issues": "https://github.com/jrchamp/google-login/issues"
+	},
+	"require": {},
+	"require-dev" : {
+		"wp-coding-standards/wpcs": "@stable",
+		"phpcompatibility/phpcompatibility-wp": "@stable"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}
