@@ -5,6 +5,8 @@
  * @package signin-google
  */
 
+defined( 'ABSPATH' ) || exit;
+
 spl_autoload_register(
 	function ( $class_name ) {
 		static $class_map = array(

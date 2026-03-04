@@ -103,14 +103,6 @@ add_action(
 	100
 );
 
-// Load the plugin translation if available (backward compatibility for WordPress before 6.7.0).
-add_action(
-	'init',
-	function () {
-		load_plugin_textdomain( 'signin-google', false, plugin_basename( __DIR__ ) . '/languages' );
-	}
-);
-
 add_filter(
 	'plugin_action_links_' . plugin_basename( __FILE__ ),
 	/**
