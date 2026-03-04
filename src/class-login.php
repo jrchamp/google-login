@@ -41,6 +41,8 @@ class Login {
 		/**
 		 * Actions.
 		 */
+		add_action( 'login_enqueue_scripts', array( $this, 'login_scripts' ) );
+		add_action( 'login_footer', array( $this, 'login_button' ) );
 		add_action( 'wp_login', array( $this, 'login_redirect' ) );
 
 		/**
@@ -50,7 +52,6 @@ class Login {
 		add_filter( 'authenticate', array( $this, 'authenticate' ), 20 );
 		add_filter( 'google_login_redirect_url', array( $this, 'redirect_url' ) );
 		add_filter( 'google_login_state', array( $this, 'state_redirect' ) );
-		add_filter( 'login_message', array( $this, 'login_button' ) );
 	}
 
 	/**
@@ -87,16 +88,13 @@ class Login {
 	}
 
 	/**
-	 * Add the login button to login form.
-	 *
-	 * @param string $message Message string.
-	 * @return array
+	 * Add the login button to login page.
 	 */
-	public function login_button( $message ) {
+	public function login_button() {
 		$login_url = services( 'google_client' )->authorization_url();
 
 		if ( empty( $login_url ) ) {
-			return $message;
+			return;
 		}
 
 		if ( is_user_logged_in() ) {
@@ -104,22 +102,108 @@ class Login {
 			$button_url = wp_logout_url( $this->get_redirect_url() );
 		} else {
 			$button_url = $login_url;
-			$button_text = __( 'Log in with Google', 'google-login' );
+			$button_text = __( 'Sign in with Google', 'google-login' );
 		}
-
-		ob_start();
 		?>
-<div class="google_login message">
-	<div class="google_login__button-container button-group">
-		<a class="google_login__button button button-primary button-large aligncenter" rel="nofollow" href="<?php echo esc_url( $button_url ); ?>">
-			<span class="google_login__google-icon"></span>
-			<?php echo esc_html( $button_text ); ?>
-		</a>
-	</div>
-</div>
+		<div class="google-login-wrapper">
+			<a rel="nofollow" href="<?php echo esc_url( $button_url ); ?>">
+				<button class="google-login-button">
+					<div class="google-login-button-content">
+						<div class="google-login-button-icon">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+								<path fill="#ea4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5"/>
+								<path fill="#4285f4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65"/>
+								<path fill="#fbbc05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78z"/>
+								<path fill="#34a853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48"/>
+								<path fill="none" d="M0 0h48v48H0z"/>
+							</svg>
+						</div>
+						<span class="google-login-button-text"><?php echo esc_html( $button_text ); ?></span>
+					</div>
+				</button>
+			</a>
+		</div>
 		<?php
-		$message .= ob_get_clean();
-		return $message;
+	}
+
+	/**
+	 * Add the login button to login page.
+	 */
+	public function login_scripts() {
+		/*
+		wp_enqueue_style(
+			'google-login-css',
+			plugins_url( 'assets/login.css', __FILE__ ),
+			array( 'login' ),
+			'1.0.0'
+		);
+		 */
+		wp_add_inline_style(
+			'login',
+			"
+				.google-login-wrapper {
+					width: 320px;
+					text-align: center;
+					margin: 20px auto;
+				}
+
+				.google-login-button {
+					background-color: white;
+					background-image: none;
+					border: 1px solid #747775;
+					border-radius: 4px;
+					box-sizing: border-box;
+					color: #1f1f1f;
+					cursor: pointer;
+					font-family: 'Roboto', arial, sans-serif;
+					font-size: 14px;
+					height: 40px;
+					letter-spacing: 0.25px;
+					outline: none;
+					overflow: hidden;
+					padding: 0 12px;
+					position: relative;
+					text-align: center;
+					transition: background-color .218s, border-color .218s, box-shadow .218s;
+					vertical-align: middle;
+					white-space: nowrap;
+					width: auto;
+					max-width: 400px;
+					min-width: min-content;
+				}
+
+				.google-login-button:hover {
+					box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+				}
+
+				.google-login-button-icon {
+					height: 20px;
+					margin-right: 10px;
+					min-width: 20px;
+					width: 20px;
+				}
+
+				.google-login-button-content {
+					align-items: center;
+					display: flex;
+					flex-direction: row;
+					flex-wrap: nowrap;
+					height: 100%;
+					justify-content: space-between;
+					position: relative;
+					width: 100%;
+				}
+
+				.google-login-button-text {
+					flex-grow: 1;
+					font-family: 'Roboto', arial, sans-serif;
+					font-weight: 500;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					vertical-align: top;
+				}
+			"
+		);
 	}
 
 	/**
